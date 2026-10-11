@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>UCHIHA V5</title>
+<style>
+:root{color-scheme:dark}*{box-sizing:border-box}body{margin:0;min-height:100vh;background:radial-gradient(circle at top,#202020,#070707 60%);font-family:Arial,sans-serif;color:#f6f6f6;display:flex;justify-content:center;align-items:center;padding:18px}.card{width:100%;max-width:430px;background:#111;border:1px solid #303030;border-radius:20px;padding:22px;box-shadow:0 16px 50px #0009}h1{margin:0 0 8px;text-align:center;letter-spacing:3px} .sub{text-align:center;color:#aaa;font-size:13px;margin:0 0 22px}input{width:100%;padding:14px;border-radius:10px;border:1px solid #444;background:#080808;color:white;font-size:15px}button{font-size:14px;font-weight:700;cursor:pointer;border:1px solid #333;border-radius:10px;padding:13px;color:#fff;background:#202020}button:active{transform:scale(.99)}.primary{width:100%;margin-top:12px;background:#f3f3f3;color:#111;border-color:#f3f3f3}.hint{min-height:20px;font-size:13px;text-align:center;margin:12px 0 0}.features{display:grid;grid-template-columns:1fr 1fr;gap:10px}.toggle{display:flex;align-items:center;justify-content:space-between;gap:8px;text-align:left;min-height:62px}.toggle span{font-size:13px}.toggle b{font-size:11px;color:#aaa;border:1px solid #444;border-radius:20px;padding:5px 7px}.toggle.on{border-color:#e6e6e6;background:#303030}.toggle.on b{background:#eee;color:#111;border-color:#eee}.wide{width:100%;margin-top:12px}.status{text-align:center;color:#aaa;font-size:12px;margin:15px 0 0}#app{display:none}.small{font-size:11px;color:#888;line-height:1.5;margin-top:16px}
+</style></head><body>
+<section class="card" id="login"><h1>UCHIHA V5</h1><p class="sub">NHẬP KEY ĐỂ VÀO GIAO DIỆN</p><input id="key" placeholder="Nhập key của bạn" autocomplete="off"><button class="primary" id="activate">KÍCH HOẠT</button><p class="hint" id="msg" aria-live="polite"></p><p class="small">Nhập key do trang Admin cấp. Admin và app phải được mở cùng website/trình duyệt để bản demo chia sẻ dữ liệu.</p></section>
+<section class="card" id="app"><h1>UCHIHA V5</h1><p class="sub">BẢNG ĐIỀU KHIỂN</p><div class="features" id="features"></div><button class="wide" id="all">BẬT TẤT CẢ</button><button class="wide" id="logout">THOÁT / ĐỔI KEY</button><p class="status" id="status">0 chức năng đang bật</p><p class="small">Các nút chỉ đổi trạng thái hiển thị trong giao diện mẫu; không tác động đến cơ chế ngắm hoặc ứng dụng trò chơi.</p></section>
+<script>
+const KEY_STORE='uchiha_v5_keys';
+function getKeys(){try{return JSON.parse(localStorage.getItem(KEY_STORE)||'[]')}catch(e){return []}}
+const names=['Bám Đầu','Nhẹ Tâm','Khóa Tâm','Fix Rung','Fix Lố','Êm Tâm','Nhạy Màn','Mượt Màn'];
+const states=Object.fromEntries(names.map(n=>[n,false]));
+const login=document.getElementById('login'), app=document.getElementById('app'), msg=document.getElementById('msg');
+function showApp(){login.style.display='none';app.style.display='block';renderStatus()}
+function activate(){const key=document.getElementById('key').value.trim();if(!key){msg.textContent='Vui lòng nhập key.';msg.style.color='#ff7777';return}if(!getKeys().some(item=>item.key===key && item.active!==false)){msg.textContent='Key không hợp lệ. Hãy kiểm tra lại.';msg.style.color='#ff7777';return}sessionStorage.setItem('uchiha_v5_key',key);msg.textContent='';showApp()}
+document.getElementById('activate').addEventListener('click',activate);document.getElementById('key').addEventListener('keydown',e=>{if(e.key==='Enter')activate()});
+const featureBox=document.getElementById('features');names.forEach(name=>{const b=document.createElement('button');b.className='toggle';b.innerHTML=`<span>${name}</span><b>TẮT</b>`;b.addEventListener('click',()=>{states[name]=!states[name];b.classList.toggle('on',states[name]);b.querySelector('b').textContent=states[name]?'BẬT':'TẮT';renderStatus()});featureBox.appendChild(b)});
+function renderStatus(){document.getElementById('status').textContent=Object.values(states).filter(Boolean).length+' chức năng đang bật'}
+document.getElementById('all').addEventListener('click',()=>{const turnOn=Object.values(states).some(v=>!v);names.forEach((name,i)=>{states[name]=turnOn;const b=featureBox.children[i];b.classList.toggle('on',turnOn);b.querySelector('b').textContent=turnOn?'BẬT':'TẮT'});document.getElementById('all').textContent=turnOn?'TẮT TẤT CẢ':'BẬT TẤT CẢ';renderStatus()});
+document.getElementById('logout').addEventListener('click',()=>{sessionStorage.removeItem('uchiha_v5_key');document.getElementById('key').value='';app.style.display='none';login.style.display='block';msg.textContent=''});
+if(sessionStorage.getItem('uchiha_v5_key') && getKeys().some(item=>item.key===sessionStorage.getItem('uchiha_v5_key') && item.active!==false))showApp();
+</script></body></html>
